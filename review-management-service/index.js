@@ -3,7 +3,7 @@ const amqp = require('amqplib');
 const PORT = process.env.PORT || 3000;
 const amqpUrl = process.env.RABBITMQ_URL;
 
-async function waitForRabbitMQ(url, retries = 10, delay = 3000) {
+async function waitForRabbitMQ(url, retries = 30, delay = 3000) {
   for (let i = 0; i < retries; i++) {
     try {
         console.log(`Attempting to connect to RabbitMQ at ${url}...`);

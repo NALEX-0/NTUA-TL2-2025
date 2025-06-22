@@ -1,7 +1,7 @@
 // routes/institutions.js
 // Διαχείριση ιδρυμάτων & διαχείριση credits (tokens) με Sequelize
 const express = require('express');
-const { institutions, sequelize } = require('../models');  // Φορτώνουμε τα μοντέλα και το Sequelize instance
+const db = require('../models');
 const router = express.Router();
 
 /**
@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     console.log('[DEBUG] Fetching all institutions');
-    const rows = await institutions.findAll({
+    const rows = await db.institutions.findAll({
       attributes: ['id', 'name', 'tokens']
     });
     return res.json(rows);
@@ -51,7 +51,7 @@ router.get('/:institutionId', async (req, res) => {
   const id = req.params.institutionId;
   try {
     console.log(`[DEBUG] Fetching institution ${id}`);
-    const inst = await institutions.findByPk(id, {
+    const inst = await db.institutions.findByPk(id, {
       attributes: ['id', 'name', 'tokens']
     });
     if (!inst) {
@@ -91,7 +91,7 @@ router.get('/:institutionId/credits', async (req, res) => {
   const id = req.params.institutionId;
   try {
     console.log(`[DEBUG] Getting credits for institution ${id}`);
-    const inst = await institutions.findByPk(id, { attributes: ['tokens'] });
+    const inst = await db.institutions.findByPk(id, { attributes: ['tokens'] });
     if (!inst) {
       return res.status(404).json({ error: 'Institution not found' });
     }
@@ -116,7 +116,7 @@ router.post('/:institutionId/credits/purchase', async (req, res) => {
     console.log(`[DEBUG] Purchasing ${amount} credits for ${id}`);
     // Χρήση convenience μεθόδου Sequelize για atomic increment
     await institutions.increment('tokens', { by: amount, where: { id } });
-    const inst = await institutions.findByPk(id, { attributes: ['tokens'] });
+    const inst = await db.institutions.findByPk(id, { attributes: ['tokens'] });
     return res.json({ creditBalance: inst.tokens });
   } catch (err) {
     console.error(`[ERROR] POST /institutions/${id}/credits/purchase failed:`, err);
@@ -128,33 +128,57 @@ router.post('/:institutionId/credits/purchase', async (req, res) => {
  * POST /institutions/:institutionId/credits/consume
  * Μείωση tokens κατά το amount (π.χ. κατανάλωση credit μετά upload)
  */
+// router.post('/:institutionId/credits/consume', async (req, res) => {
+//   const id = req.params.institutionId;
+//   const { amount } = req.body;
+//   if (!Number.isInteger(amount) || amount <= 0) {
+//     return res.status(400).json({ error: 'Invalid amount' });
+//   }
+//   try {
+//     console.log(`[DEBUG] Consuming ${amount} credits for ${id}`);
+//     // Βεβαιωνόμαστε ότι υπάρχει αρκετό υπόλοιπο σε ένα transaction
+//     await sequelize.transaction(async (t) => {
+//       const inst = await institutions.findByPk(id, { transaction: t });
+//       if (!inst) throw new Error('NOT_FOUND');
+//       if (inst.tokens < amount) throw new Error('NO_CREDITS');
+//       await inst.decrement('tokens', { by: amount, transaction: t });
+//     });
+//     const updated = await institutions.findByPk(id, { attributes: ['tokens'] });
+//     return res.json({ remainingCredits: updated.tokens });
+//   } catch (err) {
+//     if (err.message === 'NOT_FOUND') {
+//       return res.status(404).json({ error: 'Institution not found' });
+//     }
+//     if (err.message === 'NO_CREDITS') {
+//       return res.status(403).json({ error: 'Insufficient credits' });
+//     }
+//     console.error(`[ERROR] POST /institutions/${id}/credits/consume failed:`, err);
+//     return res.status(500).json({ error: 'Database error consuming credits' });
+//   }
+// });
+
 router.post('/:institutionId/credits/consume', async (req, res) => {
   const id = req.params.institutionId;
-  const { amount } = req.body;
-  if (!Number.isInteger(amount) || amount <= 0) {
+  const amount = parseInt(req.body.amount, 10);
+
+  if (isNaN(amount) || amount <= 0) {
     return res.status(400).json({ error: 'Invalid amount' });
   }
+
   try {
-    console.log(`[DEBUG] Consuming ${amount} credits for ${id}`);
-    // Βεβαιωνόμαστε ότι υπάρχει αρκετό υπόλοιπο σε ένα transaction
-    await sequelize.transaction(async (t) => {
-      const inst = await institutions.findByPk(id, { transaction: t });
-      if (!inst) throw new Error('NOT_FOUND');
-      if (inst.tokens < amount) throw new Error('NO_CREDITS');
-      await inst.decrement('tokens', { by: amount, transaction: t });
-    });
-    const updated = await institutions.findByPk(id, { attributes: ['tokens'] });
-    return res.json({ remainingCredits: updated.tokens });
-  } catch (err) {
-    if (err.message === 'NOT_FOUND') {
+    const inst = await db.institutions.findByPk(id);
+    if (!inst) {
       return res.status(404).json({ error: 'Institution not found' });
     }
-    if (err.message === 'NO_CREDITS') {
-      return res.status(403).json({ error: 'Insufficient credits' });
-    }
-    console.error(`[ERROR] POST /institutions/${id}/credits/consume failed:`, err);
-    return res.status(500).json({ error: 'Database error consuming credits' });
+
+    await inst.decrement('tokens', { by: amount });
+
+    return res.json({ remainingCredits: inst.tokens - amount }); // or reload if needed
+  } catch (err) {
+    console.error(`ERROR Consuming credits:`, err);
+    return res.status(500).json({ error: 'Something went wrong' });
   }
 });
+
 
 module.exports = router;

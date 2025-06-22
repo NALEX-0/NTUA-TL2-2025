@@ -3,7 +3,7 @@ const db = require('./models');
 
 const amqpUrl = process.env.RABBITMQ_URL;
 
-async function waitForRabbitMQ(url, retries = 10, delay = 3000) {
+async function waitForRabbitMQ(url, retries = 30, delay = 3000) {
     for (let i = 0; i < retries; i++) {
     try {
         const connection = await amqp.connect(url);
