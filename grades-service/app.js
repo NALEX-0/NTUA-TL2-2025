@@ -6,6 +6,8 @@ const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const ExcelJS = require('exceljs');
+// const { Sequelize } = require('sequelize');
+// const Sequelize = require('sequelize');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const upload = multer({ dest: 'uploads/' });
@@ -18,14 +20,15 @@ if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
+// docker-compose -p clearsky up --build
 app.get('/grades/test', async (req, res) => {
-    try {
+  try {
     const id = await requestTeacherInstitution(4);
     console.log('Teacher Institution ID:', id);
     const Yid = id?.[0]?.institution_id ?? null;
     console.log('Actual Institution ID:', Yid);
     
-    const response = await axios.get(`http://localhost:3005/institutions/${Yid}/credits`);
+    const response = await axios.get(`http://institution-service:3000/institutions/${Yid}/credits`);
     const tokens = response.data.tokens;
     console.log('Current balance:', tokens);
 
@@ -120,119 +123,216 @@ app.post('/grades/confirm', authenticateJWT, async (req, res) => {
     });
   }
 
-  const t = await sequelize.transaction();
+  // const t = await db.sequelize.transaction();
+  // try {
+  //   try {
+  //     const upload = await db.uploads.findOne({ where: { uid } });
+  //     if (!upload) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         message: 'Upload not found'
+  //       });
+  //     }
+
+  //     const workbook = new ExcelJS.Workbook();
+  //     await workbook.xlsx.load(upload.file);
+  //     const worksheet = workbook.worksheets[0];
+
+  //     const course = worksheet.getCell('E4').value || 'Unknown Course';       
+  //     const semester = worksheet.getCell('D4').value || 'Unknown Semester';
+
+  //     const exam = await db.examinations.create({
+  //       teacher_id: instructor_id,
+  //       course,
+  //       semester
+  //     });
+
+  //     const studentAMs = [];
+  //     const gradesData = [];
+
+  //     worksheet.eachRow((row, rowNumber) => {
+  //       if (rowNumber >= 4) {      
+  //         const amCell = row.getCell(1); 
+  //         const am = amCell?.value?.toString()?.trim(); 
+
+  //         if (am) {
+  //           studentAMs.push(am);             
+  //           gradesData.push({ am, row });    
+  //         }
+  //       }
+  //     });
+
+  //     const studentRecords = await db.students.findAll({
+  //       where: { am: studentAMs }
+  //     });
+
+  //     const studentMap = new Map();
+  //     studentRecords.forEach(student => {
+  //       studentMap.set(student.am, student.id);
+  //     });
+
+  //     for (const entry of gradesData) {
+  //       const studentId = studentMap.get(entry.am);
+  //       if (!studentId) continue; 
+
+  //       const gradeCell = entry.row.getCell(7);
+  //       const gradeValue = gradeCell?.value;
+
+  //       await db.grades.create({
+  //         student_id: studentId,
+  //         examination_id: exam.id,
+  //         value: parseInt(gradeValue),
+  //         state: "Open"
+  //       });
+  //     }
+
+  //     await db.logs.create({
+  //       uid,
+  //       teacher_id: instructor_id,
+  //       action: 'confirm',
+  //       message: `Grades confirmed by instructor: ${instructor_id}`
+  //     });
+
+  //   } catch (err) {
+  //     throw new Error('Error confirming grades: ' + err.message);
+  //   }
+
+  //   try {
+  //     const id_response = await requestTeacherInstitution(4);
+  //     const id = id_response?.[0]?.institution_id ?? null 
+
+  //     const response = await axios.get(`http://institution-service:3000/institutions/${id}/credits`);
+  //     const tokens = response.data.tokens;
+
+  //     if (tokens <= 0) {
+  //       throw new Error("Error not enough tokens");
+  //     }
+
+  //     const repsonse = await axios.post(`http://institution-service:3000/${id}/credits/consume`, {
+  //       params: {
+  //         amount: 1 
+  //       }
+  //     });
+
+  //     console.log("done");
+
+  //   } catch(err) {
+  //     throw new Error('Charging processing failed: ' + err.message);
+  //   }
+
+  //   await t.commit();
+  //   res.json({
+  //       success: true,
+  //       message: `Grades confirmed by instructor: ${instructor_id}`
+  //   });
+    
+  // } catch (error) {
+  //   await t.rollback();
+  //   console.error('Operation failed:', error.message);
+  //   res.status(500).json({ success: false, message: error.message });
+  // }
+
+  const t = await db.sequelize.transaction();
   try {
-    try {
-      const upload = await db.uploads.findOne({ where: { uid } });
-      if (!upload) {
-        return res.status(404).json({
-          success: false,
-          message: 'Upload not found'
-        });
-      }
-
-      const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(upload.file);
-      const worksheet = workbook.worksheets[0];
-
-      const course = worksheet.getCell('E4').value || 'Unknown Course';       
-      const semester = worksheet.getCell('D4').value || 'Unknown Semester';
-
-      const exam = await db.examinations.create({
-        teacher_id: instructor_id,
-        course,
-        semester
+    const upload = await db.uploads.findOne({ where: { uid }, transaction: t });
+    if (!upload) {
+      await t.rollback();
+      return res.status(404).json({
+        success: false,
+        message: 'Upload not found',
       });
-
-      const studentAMs = [];
-      const gradesData = [];
-
-      worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber >= 4) {      
-          const amCell = row.getCell(1); 
-          const am = amCell?.value?.toString()?.trim(); 
-
-          if (am) {
-            studentAMs.push(am);             
-            gradesData.push({ am, row });    
-          }
-        }
-      });
-
-      const studentRecords = await db.students.findAll({
-        where: { am: studentAMs }
-      });
-
-      const studentMap = new Map();
-      studentRecords.forEach(student => {
-        studentMap.set(student.am, student.id);
-      });
-
-      for (const entry of gradesData) {
-        const studentId = studentMap.get(entry.am);
-        if (!studentId) continue; 
-
-        const gradeCell = entry.row.getCell(7);
-        const gradeValue = gradeCell?.value;
-
-        await db.grades.create({
-          student_id: studentId,
-          examination_id: exam.id,
-          value: parseInt(gradeValue),
-          state: "Open"
-        });
-      }
-
-      await db.logs.create({
-        uid,
-        teacher_id: instructor_id,
-        action: 'confirm',
-        message: `Grades confirmed by instructor: ${instructor_id}`
-      });
-
-    } catch (err) {
-      throw new Error('Error confirming grades: ' + err.message);
     }
 
-    try {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(upload.file);
+    const worksheet = workbook.worksheets[0];
 
-      // Step 1: Get institution id
-      const id_response = await requestTeacherInstitution(4);
-      const id = id_response?.[0]?.institution_id ?? null 
+    const course = worksheet.getCell('E4').value || 'Unknown Course';
+    const semester = worksheet.getCell('D4').value || 'Unknown Semester';
 
-      // Step 2: Get balance '/:institutionId/credits'
-      const response = await axios.get(`http://localhost:3005/statistics/stats`, {
-        params: {
-            // student_id,
-            examination_id: id
+    const exam = await db.examinations.create({
+      teacher_id: instructor_id,
+      course,
+      semester,
+    }, { transaction: t });
+
+    const studentAMs = [];
+    const gradesData = [];
+
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber >= 4) {
+        const amCell = row.getCell(1);
+        const am = amCell?.value?.toString()?.trim();
+        if (am) {
+          studentAMs.push(am);
+          gradesData.push({ am, row });
         }
-      });
+      }
+    });
 
-      // Step 3: If balance > amount_we_charge -> proceed
-      //         else ...
+    const studentRecords = await db.students.findAll({
+      where: { am: studentAMs },
+      transaction: t,
+    });
 
-      // Step 4: Pay '/:institutionId/credits/consume'
+    const studentMap = new Map();
+    studentRecords.forEach(student => {
+      studentMap.set(student.am, student.id);
+    });
 
+    for (const entry of gradesData) {
+      const studentId = studentMap.get(entry.am);
+      if (!studentId) continue;
 
-      // Try and catch logic: We have two opertions, 1: Payment, 2: db inserting, ...
-      // Either both operations succeed, or neither should happen 
+      const gradeCell = entry.row.getCell(7);
+      const gradeValue = gradeCell?.value;
 
-
-    } catch(err) {
-      throw new Error('Charging processing failed: ' + err.message);
+      await db.grades.create({
+        student_id: studentId,
+        examination_id: exam.id,
+        value: parseInt(gradeValue),
+        state: 'Open',
+      }, { transaction: t });
     }
+
+    await db.logs.create({
+      uid,
+      teacher_id: instructor_id,
+      action: 'confirm',
+      message: `Grades confirmed by instructor: ${instructor_id}`,
+    }, { transaction: t });
+
+    // External API logic should be outside the transaction ideally, 
+    // or only after successful local commit (to avoid rollback failures)
+
+    const id_response = await requestTeacherInstitution(4);
+    const id = id_response?.[0]?.institution_id ?? null;
+
+    const response = await axios.get(`http://institution-service:3000/institutions/${id}/credits`);
+    const tokens = response.data.tokens;
+
+    if (tokens <= 0) {
+      throw new Error("Error: not enough tokens");
+    }
+
+    await axios.post(`http://institution-service:3000/${id}/credits/consume`, {
+      params: { amount: 1 },
+    });
 
     await t.commit();
     res.json({
-        success: true,
-        message: `Grades confirmed by instructor: ${instructor_id}`
+      success: true,
+      message: `Grades confirmed by instructor: ${instructor_id}`,
     });
-    
+
   } catch (error) {
     await t.rollback();
     console.error('Operation failed:', error.message);
     res.status(500).json({ success: false, message: error.message });
   }
+
+
+
 });
 
 
