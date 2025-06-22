@@ -2,13 +2,55 @@
 	"info": {
 		"_postman_id": "6e6860ac-8d5b-4c43-9779-7873d58d0521",
 		"name": "TL2",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
-		"_exporter_id": "40242224"
+		"description": "Make things easier by avoiding diffcult things.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38953863",
+		"_collection_link": "https://we6666-7982.postman.co/workspace/My-Workspace~d613ce01-a118-4549-8720-1690611a4198/collection/40242224-6e6860ac-8d5b-4c43-9779-7873d58d0521?action=share&source=collection_link&creator=38953863"
 	},
 	"item": [
 		{
+			"name": "users/login/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    // \"email\": \"n.panagiotou@student.uoc.gr\"\r\n    \"email\": \"a.ioannou@unipi.gr\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3004/users/login/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3004",
+					"path": [
+						"users",
+						"login",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "grades/upload",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsInJvbGUiOiJJTlNUUlVDVE9SIiwidGVhY2hlcklkIjo0LCJpYXQiOjE3NTA2MTg3ODYsImV4cCI6MTc1MDYyMjM4Nn0.D09V3fQ1cyWoV8J26K3wXKFlLJsb48gieb6ci_IJU4Y",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -21,7 +63,18 @@
 						}
 					]
 				},
-				"url": "http://localhost:3001/grades/upload"
+				"url": {
+					"raw": "http://localhost:3002/grades/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"grades",
+						"upload"
+					]
+				}
 			},
 			"response": []
 		},
@@ -29,7 +82,14 @@
 			"name": "grades/confirm",
 			"request": {
 				"auth": {
-					"type": "noauth"
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsInJvbGUiOiJJTlNUUlVDVE9SIiwidGVhY2hlcklkIjo0LCJpYXQiOjE3NTA2MDQyOTgsImV4cCI6MTc1MDYwNzg5OH0.kc9cqM-vbkwIOz4Om-_wdm0j4cbuWWElbRB8yPvrtKY",
+							"type": "string"
+						}
+					]
 				},
 				"method": "POST",
 				"header": [
@@ -41,20 +101,41 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"uid\": \"014c19d7-7945-4dca-b5e8-49d264eede2f\",\r\n  \"instructor_id\": \"1\"\r\n}\r\n",
+					"raw": "{\r\n  \"uid\": \"c6128a2a-8fa8-4f88-a074-75cc74fe65c3\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "http://localhost:3001/grades/confirm"
+				"url": {
+					"raw": "http://localhost:3002/grades/confirm",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"grades",
+						"confirm"
+					]
+				}
 			},
 			"response": []
 		},
 		{
 			"name": "grades/cancel",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsInJvbGUiOiJJTlNUUlVDVE9SIiwidGVhY2hlcklkIjo0LCJpYXQiOjE3NTA2MTg3ODYsImV4cCI6MTc1MDYyMjM4Nn0.D09V3fQ1cyWoV8J26K3wXKFlLJsb48gieb6ci_IJU4Y",
+							"type": "string"
+						}
+					]
+				},
 				"method": "POST",
 				"header": [
 					{
@@ -65,14 +146,25 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"uid\": \"610ed016-23e2-4c89-b74b-54fdbb5db168\",\r\n  \"instructor_id\": \"1\"\r\n}\r\n",
+					"raw": "{\r\n  \"uid\": \"610ed016-23e2-4c89-b74b-54fdbb5db168\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "http://localhost:3001/grades/cancel"
+				"url": {
+					"raw": "http://localhost:3002/grades/cancel",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3002",
+					"path": [
+						"grades",
+						"cancel"
+					]
+				}
 			},
 			"response": []
 		},
@@ -94,12 +186,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3001/grades/examination?examination_id=25",
+					"raw": "http://localhost:3002/grades/examination?examination_id=25",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3001",
+					"port": "3002",
 					"path": [
 						"grades",
 						"examination"
@@ -120,12 +212,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3001/grades/student?student_id=42&state=Open",
+					"raw": "http://localhost:3002/grades/student?student_id=42&state=Open",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3001",
+					"port": "3002",
 					"path": [
 						"grades",
 						"student"
@@ -145,17 +237,17 @@
 			"response": []
 		},
 		{
-			"name": "instructor-examinations",
+			"name": "grades/instructor-examinations",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3001/grades/instructor-examinations?id=1&role=student",
+					"raw": "http://localhost:3002/grades/instructor-examinations?id=1&role=student",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3001",
+					"port": "3002",
 					"path": [
 						"grades",
 						"instructor-examinations"
@@ -177,15 +269,25 @@
 		{
 			"name": "statistics/stats",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsInJvbGUiOiJJTlNUUlVDVE9SIiwidGVhY2hlcklkIjo0LCJpYXQiOjE3NTA2MTg3ODYsImV4cCI6MTc1MDYyMjM4Nn0.D09V3fQ1cyWoV8J26K3wXKFlLJsb48gieb6ci_IJU4Y",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3002/statistics/stats?examination_id=25",
+					"raw": "http://localhost:3001/statistics/stats?examination_id=25",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "3002",
+					"port": "3001",
 					"path": [
 						"statistics",
 						"stats"
@@ -203,18 +305,32 @@
 		{
 			"name": "reviews/new",
 			"request": {
+				"auth": {
+					"type": "noauth"
+				},
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"gradeId\": 220,\n    \"message\": \"I deserve something much better\"\n}",
+					"raw": "{\n\t\"gradeId\": 8,\n    \"message\": \"I deserve something better\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "{{base_url}}/reviews/new"
+				"url": {
+					"raw": "http://localhost:3003/reviews/new",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3003",
+					"path": [
+						"reviews",
+						"new"
+					]
+				}
 			},
 			"response": []
 		},
@@ -224,11 +340,21 @@
 				"disableBodyPruning": true
 			},
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsInJvbGUiOiJJTlNUUlVDVE9SIiwidGVhY2hlcklkIjo0LCJpYXQiOjE3NTA2MTg3ODYsImV4cCI6MTc1MDYyMjM4Nn0.D09V3fQ1cyWoV8J26K3wXKFlLJsb48gieb6ci_IJU4Y",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"state\": \"Pending\",\r\n    \"role\": \"student\",\r\n    \"userId\": 4\r\n}",
+					"raw": "{\r\n    \"userId\": 8\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -236,10 +362,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/reviews",
+					"raw": "http://localhost:3003/reviews",
+					"protocol": "http",
 					"host": [
-						"{{base_url}}"
+						"localhost"
 					],
+					"port": "3003",
 					"path": [
 						"reviews"
 					],
@@ -268,7 +396,87 @@
 						}
 					}
 				},
-				"url": "{{base_url}}/reviews/8/response"
+				"url": {
+					"raw": "http://localhost:3003/reviews/9/response",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3003",
+					"path": [
+						"reviews",
+						"9",
+						"response"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/institutions",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"state\": \"Pending\",\r\n    \"role\": \"student\",\r\n    \"userId\": 4\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3005/institutions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3005",
+					"path": [
+						"institutions"
+					],
+					"query": [
+						{
+							"key": "state",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "institutions/:institutionId/credits",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"state\": \"Pending\",\r\n    \"role\": \"student\",\r\n    \"userId\": 4\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3005/institutions/4/credits",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3005",
+					"path": [
+						"institutions",
+						"4",
+						"credits"
+					],
+					"query": [
+						{
+							"key": "state",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
 			},
 			"response": []
 		}

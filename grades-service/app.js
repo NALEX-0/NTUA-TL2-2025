@@ -19,24 +19,6 @@ if (!fs.existsSync('uploads')) {
 }
 
 // docker-compose -p clearsky up --build
-app.get('/grades/test', async (req, res) => {
-  try {
-    const id = await requestTeacherInstitution(4);
-    console.log('Teacher Institution ID:', id);
-    const Yid = id?.[0]?.institution_id ?? null;
-    console.log('Actual Institution ID:', Yid);
-    const response = await axios.get(`http://institution-service:3000/institutions/${Yid}/credits`);
-    const tokens = response.data.tokens;
-    console.log('Current balance:', tokens);
-
-    return res.json('all fine');
-  }
-  catch (err) {
-    console.error('Error fetching institution ID:', err);
-    return res.json('all wrong');
-  }
-});
-
 app.post('/grades/upload', authenticateJWT, upload.single('file'), async (req, res) => {
   const file = req.file;
 
