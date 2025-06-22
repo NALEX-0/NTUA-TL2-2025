@@ -128,18 +128,15 @@ app.post('/reviews/:reviewId/response', async (req, res) => {
         return res.status(404).json({ error: 'Grade not found' });
     }
     
-    review.set({
+    await review.save({
         state: action === 'approve' ? 'Approved' : 'Rejected',
         response_message: response
     });
-    
-    grade.set({
+
+    await grade.save({
         value: newGrade,
-        state: 1 // 1 for approved
+        state: 1
     });
-    
-    await review.save();
-    await grade.save();
     
     const responseBody = {
         reviewId: review.id,
